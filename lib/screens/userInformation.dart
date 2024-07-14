@@ -382,10 +382,12 @@ class _UserInformationPageState extends State<UserInformationPage> {
             isApiCallProcess = false;
           });
           if (response) {
+            bool signup = true;
             Navigator.pushNamedAndRemoveUntil(
               context,
               '/home',
                   (route) => false,
+              arguments: signup,
             );
           } else {
             showSnackBar(context, "Enter Correct details");

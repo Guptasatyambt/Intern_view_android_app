@@ -5,6 +5,7 @@ import 'package:snippet_coder_utils/ProgressHUD.dart';
 import 'package:intern_view/utils/utils.dart';
 import '../models/login_request_model.dart';
 import '../services/api_service.dart';
+import '../services/shared_service.dart';
 import '../widgets/customButton.dart';
 
 class LoginPage extends StatefulWidget {
@@ -197,10 +198,12 @@ class _LoginPageState extends State<LoginPage> {
           });
 
           if (response) {
+            bool signup=false;
             Navigator.pushNamedAndRemoveUntil(
               context,
               '/home',
                   (route) => false,
+              arguments: signup,
             );
           } else {
             showSnackBar(context, "Enter Correct details");

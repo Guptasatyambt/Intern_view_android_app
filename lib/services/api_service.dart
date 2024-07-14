@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:camera/camera.dart';
 import 'package:intern_view/models/login_request_model.dart';
 import 'package:intern_view/models/login_responce_model.dart';
 import 'package:intern_view/models/register_request_model.dart';
 import 'package:intern_view/models/register_responce_model.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:intern_view/models/upload_video_request_model.dart';
+import 'package:path/path.dart' as path;
+import 'package:http_parser/http_parser.dart';
 import '../../config.dart';
 import '../models/feedback_request_model.dart';
 import '../models/updateuser_request_model.dart';
@@ -118,6 +121,52 @@ class APIService {
     }
   }
 
+  static Future<String> uploadvideo(String video) async {
+    var url = Uri.parse('https://intern-view.onrender.com/user/uploadvideo');
+    var request = http.MultipartRequest('POST', url);
+    // Add video file
+    if (video!=null) {
+      // var file = File(video.path);
+      var multipartFile = await http.MultipartFile.fromPath(
+        'video',
+        video,
+        // contentType: MediaType.parse(mimeType),
+      );
+      // Add the multipart file to the request's files list
+      request.files.add(multipartFile);
+    }
+    // request.fields['uid'] = model.uid!;
+    try {
+      var cacheData = await SharedService.loginDetails();
+      var token = cacheData?.data.token;
+      request.fields['uid'] = cacheData!.data.id;
+      if (token != null) {
+        // Add token to request headers
+        request.headers['Authorization'] = 'Bearer $token';
+      } else {
+        return "Token is null";
+      }
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        // Assuming that on success, you might want to return the response as a string
+        var responseData = await http.Response.fromStream(response);
+        var responseBody = json.decode(responseData.body);
+
+        // Assuming the response body contains the uid field
+        if (responseBody.containsKey('url')) {
+          return responseBody['url'];
+        } else {
+          return "uid not found in response";
+        }
+      } else {
+        return "Failed to upload: ${response.statusCode}";// Adjust this based on your actual needs
+      }
+    } catch (e) {
+      return "Error: $e";
+    }
+  }
 
   static Future<bool> updateuser(UpdateuserRequestModel model,
       String profileimage,
@@ -133,13 +182,9 @@ class APIService {
         'profileimage',
         file.path,
       );
-
-
       // Add the multipart file to the request's files list
       request.files!.add(multipartFile);
     }
-
-
     // Add resume file
     if (resume != null) {
       var file = File(resume!);
@@ -147,8 +192,6 @@ class APIService {
         'resume',
         file.path,
       );
-
-
       // Add the multipart file to the request's files list
       request.files!.add(multipartFile);
     }

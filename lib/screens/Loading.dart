@@ -15,7 +15,6 @@ class _LoadingState extends State<Loading> {
   Future<void> startApp(BuildContext context) async {
     try {
       await Future.delayed(const Duration(seconds: 2));
-
       bool result=await SharedService.isLoggedIn();
       var loginDetails = await SharedService.loginDetails();
       var name="";
@@ -24,10 +23,12 @@ class _LoadingState extends State<Loading> {
       }
       if (result ) {
           if(name!=""){
+            bool signup=false;
             Navigator.pushNamedAndRemoveUntil(
               context,
               '/home',
                   (route) => false,
+              arguments: signup,
             );
           }
         else{

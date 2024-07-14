@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:intern_view/screens/Loading.dart';
 import 'package:intern_view/screens/aboutus.dart';
 import 'package:intern_view/screens/contact.dart';
@@ -18,6 +20,7 @@ Future<void> main() async {
   final cameras = await availableCameras();
   final frontCamera = cameras.firstWhere((camera) => camera.lensDirection == CameraLensDirection.front);
 
+  // await Firebase.initializeApp();
   runApp(MyApp(camera: frontCamera));
 }
 

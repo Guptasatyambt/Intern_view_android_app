@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'package:path/path.dart' as Path;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:intern_view/services/api_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
+import '../models/upload_video_request_model.dart';
 import '../utils/utils.dart';
 import '../widgets/customButton.dart';
 
@@ -19,6 +20,9 @@ class PracticePage extends StatefulWidget {
 
 class _PracticePageState extends State<PracticePage> {
   late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+  late List<CameraImage> imgfrm;
+  int i=0;
   bool isRecording = false;
   late String _videoPath;
   OverlayEntry? entry;
@@ -31,6 +35,8 @@ class _PracticePageState extends State<PracticePage> {
   int seconds = maxSeconds;
   Timer? timer;
 
+
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +45,8 @@ class _PracticePageState extends State<PracticePage> {
       ResolutionPreset.high,
     );
     record = AudioRecorder();
-    _controller.initialize().then((_) {
+    imgfrm=[];
+    _initializeControllerFuture = _controller.initialize().then((_) {
       if (!mounted) {
         return;
       }
@@ -180,14 +187,24 @@ class _PracticePageState extends State<PracticePage> {
   }
 
   void interviewStrat() async {
-    APIService.startinterview().then(
-        (response)async{
-          if (response) {
+
+    // APIService.startinterview().then(
+    //     (response)async{
+    //       if (response) {
             await starttimer();
             setState(() {
+
               isRecording = !isRecording;
               if (isRecording) {
                 _controller.startVideoRecording();
+                _controller.startImageStream((image) {
+
+                  setState(() {
+                    print(image.width);
+                    imgfrm.insert(i, image);
+                    i++;
+                  });
+                });
               } else {
                 _controller.stopVideoRecording().then((XFile file) {
                   // Process the recorded video here
@@ -231,10 +248,11 @@ class _PracticePageState extends State<PracticePage> {
           );
           final overlay = Overlay.of(context)!;
           overlay.insert(entry!);
-          } else {
-            showSnackBar(context, "Enter Correct details");
-          }
-        });
+        //   }
+        //   else {
+        //     showSnackBar(context, "Enter Correct details");
+        //   }
+        // });
 
   }
 
@@ -243,12 +261,16 @@ class _PracticePageState extends State<PracticePage> {
     setState(() {
       isRecording = !isRecording;
       if (!isRecording) {
-        _controller.stopVideoRecording().then((XFile file) {
-          // Process the recorded video here
+        _controller.stopVideoRecording().then((XFile file) async {
+
+           // Process the recorded video here
           // Apply ML algorithms, save locally, etc.
           setState(() {
             _videoPath = file.path;
           });
+          var data=await APIService.uploadvideo(_videoPath);
+          print(data);
+
           print('Video Path: $_videoPath');
         });
       }

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../services/shared_service.dart';
+import '../widgets/customButton.dart';
 import 'nav_bar.dart';
 
 
@@ -20,24 +21,67 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   String name="";
+   bool signup = false ;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Accessing ModalRoute arguments after the build method is completed.
+      final args = ModalRoute.of(context)!.settings.arguments as bool?;
+      if (args != null) {
+        setState(() {
+          signup = args;
+        });
+      }
+      loadName().then((_) {
+        if(signup) {
+          _showWelcomeDialog();
+        }
+      });
+    });
 
-  // @override
-  // void initState() {
-  //   loadName();
-  //   super.initState();
-  //
-  // }
-Future<void> loadName() async {
-  var loginDetails = await SharedService.loginDetails();
-  // name=loginDetails.data.name;
-  if (loginDetails != null) {
-    name = loginDetails.data.name;
   }
-}
+  Future<void> loadName() async {
+    var loginDetails = await SharedService.loginDetails();
+    if (loginDetails != null) {
+      setState(() {
+        name = loginDetails.data.name;
+      });
+    }
+  }
+
+
+  void _showWelcomeDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          icon:Image.asset(
+            'assets/images/celebration.gif',
+            width: 50,
+            height: 50,
+          ),
+          title: Text("Welcome"),
+          content: Text("Congratulation! You got 100 Coins of welcome bonus"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+
   loadName();
+
     return Scaffold(
       backgroundColor: Colors.white,
       drawer: const Navbar(),
@@ -66,6 +110,7 @@ Future<void> loadName() async {
           ),
         ],
       ),
+
       body:  SingleChildScrollView(
           child: Column(children: [
             SizedBox(

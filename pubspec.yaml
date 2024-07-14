@@ -41,11 +41,15 @@ dependencies:
   window_manager: ^0.3.8
   url_launcher: ^6.0.0
   audioplayers: ^5.0.0
-  tflite_flutter: ^0.10.4
   record: ^5.0.5
   path_provider: ^2.0.14
   api_cache_manager: ^1.0.2
   snippet_coder_utils: ^1.0.9
+  provider: ^6.1.1
+  path: ^1.8.3
+  http_parser: ^4.0.0
+  dio: ^5.1.1
+  shared_preferences: ^2.1.1
 
 
 

@@ -4,7 +4,6 @@ import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:api_cache_manager/models/cache_db_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intern_view/models/login_responce_model.dart';
-
 import '../models/updateuser_responce_model.dart';
 
 class SharedService {
@@ -23,13 +22,9 @@ class SharedService {
 
     if (isCacheKeyExist) {
       var cacheData = await APICacheManager().getCacheData("login_details");
-
       return loginResponseJson(cacheData.syncData);
     }
   }
-
-
-
 
   static Future<void> setLoginDetails(
       LoginResponseModel loginResponse,
