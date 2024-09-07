@@ -1,31 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 
-import '../models/register_request_model.dart';
+import '../models/login_request_model.dart';
 import '../services/api_service.dart';
 import '../utils/utils.dart';
 import '../widgets/customButton.dart';
-import 'entryPage.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class UpdatePassword extends StatefulWidget {
+  const UpdatePassword({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<UpdatePassword> createState() => _UpdatePasswordState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _UpdatePasswordState extends State<UpdatePassword> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isApiCallProcess = false;
-  GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   bool _obscureText = true;
+  GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,7 +32,7 @@ class _SignUpPageState extends State<SignUpPage> {
         body:ProgressHUD(
           child: Form(
             key: globalFormKey,
-            child: _signinUI(context),
+            child: _loginUi(context),
           ),
           inAsyncCall: isApiCallProcess,
           opacity: 0.3,
@@ -44,7 +42,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _signinUI(BuildContext context){
+  Widget _loginUi (BuildContext context){
     return SingleChildScrollView(
       child: Center(
         child: Padding(
@@ -54,7 +52,8 @@ class _SignUpPageState extends State<SignUpPage> {
               Align(
                 alignment: Alignment.topLeft,
                 child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () => Navigator.pushReplacementNamed(
+                      context, '/login'),
                   child: const Icon(
                     Icons.arrow_back,
                     color: Colors.white,
@@ -72,7 +71,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 20),
               const Text(
-                "Sign UP",
+                "Update Password",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -159,20 +158,25 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               const SizedBox(height: 20),
+
+              const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: CustomButton(
                   onPressed: () =>verify(),
-                  text:'Sign-UP',
+                  text:'Update',
                 ),
 
               ),
+
+
             ],
           ),
         ),
       ),
     );
+
   }
   void verify(){
     if(emailController.text==""||passwordController.text==""){
@@ -183,28 +187,27 @@ class _SignUpPageState extends State<SignUpPage> {
         isApiCallProcess = true;
       });
 
-      RegisterRequestModel model = RegisterRequestModel(
+      LoginRequestModel model = LoginRequestModel(
         email: emailController.text,
         password: passwordController.text,
       );
-      APIService.register(model).then(
+      APIService.updatePassword(model).then(
             (response) {
           setState(() {
             isApiCallProcess = false;
           });
 
-          if (response=='true') {
+          if (response) {
             Navigator.pushNamedAndRemoveUntil(
               context,
-              '/userinformation',
+              '/login',
                   (route) => false,
             );
           } else {
-            showSnackBar(context, response);
+            showSnackBar(context, "Enter Correct details");
           }
         },
       );
     }
-    // Navigator.pushReplacementNamed(context, '/userinformation');
   }
 }

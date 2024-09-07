@@ -63,7 +63,7 @@ class Navbar extends StatelessWidget {
             },
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height*0.32,
+            height: MediaQuery.of(context).size.height*0.29,
           ),
           const Divider(height: 2,thickness: 1,color: Colors.black,),
             Row(

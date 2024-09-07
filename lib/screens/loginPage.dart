@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intern_view/screens/entryPage.dart';
 import 'package:http/http.dart' as http;
 import 'package:snippet_coder_utils/ProgressHUD.dart';
@@ -7,6 +9,7 @@ import '../models/login_request_model.dart';
 import '../services/api_service.dart';
 import '../services/shared_service.dart';
 import '../widgets/customButton.dart';
+import 'forgot_password.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -54,10 +57,8 @@ class _LoginPageState extends State<LoginPage> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: GestureDetector(
-                    onTap: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const EntryPage()),
-                    ),
+                    onTap: () => Navigator.pushReplacementNamed(
+                        context, '/entry'),
                     child: const Icon(
                       Icons.arrow_back,
                       color: Colors.white,
@@ -162,6 +163,19 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                Row(
+                  children: [
+                    SizedBox(width: MediaQuery.of(context).size.width  * 0.4,),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.pushReplacementNamed(
+                            context, '/forgot');
+                      },
+                      child: Text("Forgot Password?",style: TextStyle(color: Colors.white),),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -171,6 +185,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
 
                 ),
+
+
               ],
             ),
           ),

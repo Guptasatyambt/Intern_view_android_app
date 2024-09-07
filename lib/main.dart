@@ -1,5 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intern_view/screens/editProfile.dart';
+import 'package:intern_view/screens/entryPage.dart';
+import 'package:intern_view/screens/forgot_password.dart';
+import 'package:intern_view/screens/interviewReport.dart';
+import 'package:intern_view/screens/otp.dart';
+import 'package:intern_view/screens/updatePassword.dart';
 import 'package:provider/provider.dart';
 import 'package:intern_view/screens/Loading.dart';
 import 'package:intern_view/screens/aboutus.dart';
@@ -36,8 +42,12 @@ class MyApp extends StatelessWidget {
      debugShowCheckedModeBanner: false,
       home: const Loading(),
       routes: {
+       "/entry":(context)=> const EntryPage(),
         "/login":(context)=> const LoginPage(),
+        "/forgot":(context)=>const ForgotPassword(),
         "/signup":(context)=> const SignUpPage(),
+        "/otp":(context)=>const OtpPage(),
+        "/updatepassword":(context)=>const UpdatePassword(),
         '/userinformation':(context)=>const UserInformationPage(),
         '/navigation':(context)=>NavigatorPage(camera:camera),
         '/practice' :(context)=> PracticePage(camera:camera),
@@ -46,8 +56,11 @@ class MyApp extends StatelessWidget {
         '/home' :(context)=>const Home(),
         '/feedback' :(context)=>const FeedbackForm(),
         '/profile' :(context)=>const ProfilePage(),
+        '/editprofile':(context)=>const editProfile(),
         '/contact' :(context)=> ContactUsPage(),
         '/about' :(context)=> AboutUsPage(),
+        '/interviewreport' :(context)=> const InterviewReport(),
+
 
       },
     );

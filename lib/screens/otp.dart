@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
+import 'package:pinput/pinput.dart';
 
-import '../models/register_request_model.dart';
+import '../models/otp_request_model.dart';
 import '../services/api_service.dart';
 import '../utils/utils.dart';
 import '../widgets/customButton.dart';
-import 'entryPage.dart';
+import 'forgot_password.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class OtpPage extends StatefulWidget {
+  const OtpPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<OtpPage> createState() => _OtpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _OtpPageState extends State<OtpPage> {
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
   bool isApiCallProcess = false;
-  GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   bool _obscureText = true;
+  String? otpCode;
+  GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,7 +34,7 @@ class _SignUpPageState extends State<SignUpPage> {
         body:ProgressHUD(
           child: Form(
             key: globalFormKey,
-            child: _signinUI(context),
+            child: _loginUi(context),
           ),
           inAsyncCall: isApiCallProcess,
           opacity: 0.3,
@@ -44,7 +44,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _signinUI(BuildContext context){
+  Widget _loginUi (BuildContext context){
     return SingleChildScrollView(
       child: Center(
         child: Padding(
@@ -54,7 +54,9 @@ class _SignUpPageState extends State<SignUpPage> {
               Align(
                 alignment: Alignment.topLeft,
                 child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () => Navigator.pushReplacementNamed(
+                      context, '/forgot'),
+
                   child: const Icon(
                     Icons.arrow_back,
                     color: Colors.white,
@@ -72,14 +74,13 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 20),
               const Text(
-                "Sign UP",
+                "Enter OTP",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.white70,
                 ),
               ),
-
               const SizedBox(height: 20),
               TextFormField(
                 cursorColor: Colors.white,
@@ -114,49 +115,45 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              TextFormField(
-                cursorColor: Colors.white,
-                controller: passwordController,
-                keyboardType: TextInputType.visiblePassword,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70,
-                ),
-                obscureText: _obscureText,
-                decoration: InputDecoration(
-                  hintText: "Enter Password",
-                  hintStyle: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
-                    color: Colors.white60,
-                  ),
-                  enabledBorder: OutlineInputBorder(
+              Pinput(
+                length: 6,
+                showCursor: true,
+                defaultPinTheme: PinTheme(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.white54),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.white60),
-                  ),
-                  prefixIcon: Container(
-                    padding: const EdgeInsets.only(top: 13.0,right: 8,left:8),
-                    child: const InkWell(
-                        child:Icon(Icons.password,color: Colors.white38,)
+                    border: Border.all(
+                      color: Colors.white60,
                     ),
                   ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText; // Toggle password visibility
-                      });
+                  textStyle: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onCompleted: (value) {
+                  setState(() {
+                    otpCode = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  SizedBox(width: MediaQuery.of(context).size.width  * 0.4,),
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ForgotPassword()),
+                      );
                     },
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
-                      color: Colors.white38,
-                    ),
+                    child: Text("Resend Otp",style: TextStyle(color: Colors.white),),
                   ),
-                ),
+                ],
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -164,47 +161,49 @@ class _SignUpPageState extends State<SignUpPage> {
                 height: 50,
                 child: CustomButton(
                   onPressed: () =>verify(),
-                  text:'Sign-UP',
+                  text:'verify',
                 ),
 
               ),
+
+
             ],
           ),
         ),
       ),
     );
+
   }
   void verify(){
-    if(emailController.text==""||passwordController.text==""){
-      showSnackBar(context, "Enter all details");
+    if(otpCode==null||emailController.text==""){
+      showSnackBar(context, "Enter Otp");
     }
     else{
       setState(() {
         isApiCallProcess = true;
       });
-
-      RegisterRequestModel model = RegisterRequestModel(
+      OtpRequestModel model = OtpRequestModel(
         email: emailController.text,
-        password: passwordController.text,
+        otp: otpCode,
       );
-      APIService.register(model).then(
+
+      APIService.verifyOtp(model).then(
             (response) {
           setState(() {
             isApiCallProcess = false;
           });
 
-          if (response=='true') {
+          if (response) {
             Navigator.pushNamedAndRemoveUntil(
               context,
-              '/userinformation',
+              '/updatepassword',
                   (route) => false,
             );
           } else {
-            showSnackBar(context, response);
+            showSnackBar(context, "Wrong Otp");
           }
         },
       );
     }
-    // Navigator.pushReplacementNamed(context, '/userinformation');
   }
 }

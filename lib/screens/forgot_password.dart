@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 
-import '../models/register_request_model.dart';
 import '../services/api_service.dart';
 import '../utils/utils.dart';
 import '../widgets/customButton.dart';
-import 'entryPage.dart';
+import 'loginPage.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class ForgotPassword extends StatefulWidget {
+  const ForgotPassword({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<ForgotPassword> createState() => _ForgotPasswordState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _ForgotPasswordState extends State<ForgotPassword> {
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
   bool isApiCallProcess = false;
-  GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   bool _obscureText = true;
+  GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,7 +31,7 @@ class _SignUpPageState extends State<SignUpPage> {
         body:ProgressHUD(
           child: Form(
             key: globalFormKey,
-            child: _signinUI(context),
+            child: _loginUi(context),
           ),
           inAsyncCall: isApiCallProcess,
           opacity: 0.3,
@@ -44,7 +41,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _signinUI(BuildContext context){
+  Widget _loginUi (BuildContext context){
     return SingleChildScrollView(
       child: Center(
         child: Padding(
@@ -54,7 +51,8 @@ class _SignUpPageState extends State<SignUpPage> {
               Align(
                 alignment: Alignment.topLeft,
                 child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () => Navigator.pushReplacementNamed(
+                      context, '/login'),
                   child: const Icon(
                     Icons.arrow_back,
                     color: Colors.white,
@@ -72,7 +70,7 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 20),
               const Text(
-                "Sign UP",
+                "Forgot Password",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -113,98 +111,54 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                cursorColor: Colors.white,
-                controller: passwordController,
-                keyboardType: TextInputType.visiblePassword,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70,
-                ),
-                obscureText: _obscureText,
-                decoration: InputDecoration(
-                  hintText: "Enter Password",
-                  hintStyle: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
-                    color: Colors.white60,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.white54),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.white60),
-                  ),
-                  prefixIcon: Container(
-                    padding: const EdgeInsets.only(top: 13.0,right: 8,left:8),
-                    child: const InkWell(
-                        child:Icon(Icons.password,color: Colors.white38,)
-                    ),
-                  ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText; // Toggle password visibility
-                      });
-                    },
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
-                      color: Colors.white38,
-                    ),
-                  ),
-                ),
-              ),
+
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: CustomButton(
                   onPressed: () =>verify(),
-                  text:'Sign-UP',
+                  text:'Send OTP',
                 ),
 
               ),
+
+
             ],
           ),
         ),
       ),
     );
+
   }
   void verify(){
-    if(emailController.text==""||passwordController.text==""){
-      showSnackBar(context, "Enter all details");
+    if(emailController.text==""){
+      showSnackBar(context, "Enter Email");
     }
     else{
       setState(() {
         isApiCallProcess = true;
       });
 
-      RegisterRequestModel model = RegisterRequestModel(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      APIService.register(model).then(
+
+      APIService.forgotPassword(emailController.text).then(
             (response) {
           setState(() {
             isApiCallProcess = false;
           });
 
-          if (response=='true') {
+          if (response) {
             Navigator.pushNamedAndRemoveUntil(
               context,
-              '/userinformation',
+              '/otp',
                   (route) => false,
             );
           } else {
-            showSnackBar(context, response);
+            showSnackBar(context, "Something Went Wrong");
           }
         },
       );
     }
-    // Navigator.pushReplacementNamed(context, '/userinformation');
   }
 }
+

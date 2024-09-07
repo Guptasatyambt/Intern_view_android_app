@@ -98,6 +98,7 @@ class _HomeState extends State<Home> {
                 GestureDetector(
                   onTap:(){
                     Navigator.pushNamed(context, '/profile');
+
                   },
                   child: const CircleAvatar(
                     backgroundColor: Colors.black38,

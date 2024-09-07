@@ -50,6 +50,9 @@ dependencies:
   http_parser: ^4.0.0
   dio: ^5.1.1
   shared_preferences: ^2.1.1
+  speech_to_text: ^6.0.0
+  permission_handler: ^11.0.1
+  pinput: ^3.0.1
 
 
 
